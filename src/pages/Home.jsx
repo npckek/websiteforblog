@@ -1,7 +1,16 @@
 import React from 'react';
 import {Link} from "react-router-dom";
+import { nanoid } from 'nanoid'
+import {initializeLocalStorage} from "../utils/initData";
 
 const Home = () => {
+
+    const id = nanoid(10)
+
+    console.log(id)
+
+    initializeLocalStorage();
+
     return (
         <div className="bg-cyan-800 h-lvh w-lvw flex flex-col items-center justify-center">
             <p className="text-white text-3xl m-2">

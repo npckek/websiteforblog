@@ -1,5 +1,6 @@
 import React, {useCallback, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
+import {nanoid} from "nanoid";
 
 const Register = () => {
     const [id, setId] = useState("");
@@ -16,7 +17,7 @@ const Register = () => {
         const users = JSON.parse(localStorage.getItem("users")) || [];
         const existingUser = users.find((user) => user.email === email);
         const existingName = users.find((user) => user.name === name);
-        const id = Date.now()
+        const id = nanoid(10);
 
 
         if (password !== "" && password !== confirmPassword) {

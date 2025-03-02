@@ -7,80 +7,63 @@ import PostMeta from "./PostMeta";
 import PostContent from "./PostContent";
 import PostTags from "./PostTags";
 import PostActions from "./PostActions";
-import Post from "./Post";
-import GlobalEffect from "../hooks/Effect";
-import getStoredData from "./test";
 
 const PostsList = () => {
-    // const [posts, setPosts] = useState([]);
-    // const [userVotes, setUserVotes] = useState({});
+    const [posts, setPosts] = useState([]);
+    const [userVotes, setUserVotes] = useState({});
     const [commentInputs, setCommentInputs] = useState({});
-    // const [currentUser, setCurrentUser] = useState(null);
-    // const [filterTags, setFilterTags] = useState('');
-    // const [sortOrder, setSortOrder] = useState("newest");
-    // const [subscribedAuthors, setSubscribedAuthors] = useState([]);
+    const [currentUser, setCurrentUser] = useState(null);
+    const [filterTags, setFilterTags] = useState('');
+    const [sortOrder, setSortOrder] = useState("newest");
+    const [subscribedAuthors, setSubscribedAuthors] = useState([]);
     const [showSubscribedPosts, setShowSubscribedPosts] = useState(false);
 
-    const getStoredData = (key) => {
-        const data = localStorage.getItem(key);
-        try {
-            return data ? JSON.parse(data) : null;
-        } catch (error) {
-            console.error(`Ошибка парсинга JSON для ключа "${key}":`, error);
-            return null;
+    useEffect(() => {
+        const storedPosts = JSON.parse(localStorage.getItem("posts")) || [];
+        console.log("Stored posts:", storedPosts);
+        setPosts(storedPosts);
+
+        const storedUser = JSON.parse(localStorage.getItem("currentUser"));
+        if (storedUser) {
+            console.log("Stored user:", storedUser);
+            setCurrentUser(storedUser);
+            const storedVotes = JSON.parse(localStorage.getItem(`userVotes_${storedUser.name}`)) || {};
+            setUserVotes(storedVotes);
+
+            // Получаем подписки пользователя
+            let subscriptions = [];
+            if (storedUser.subs) {
+                if (typeof storedUser.subs === 'string') {
+                    subscriptions = storedUser.subs.split(','); // если это строка
+                } else if (Array.isArray(storedUser.subs)) {
+                    subscriptions = storedUser.subs; // если это массив
+                }
+            }
+            console.log("User subscriptions:", subscriptions);
+            setSubscribedAuthors(subscriptions);
         }
-    };
 
+        const storedSortOrder = localStorage.getItem("sortOrder");
+        if (storedSortOrder) {
+            setSortOrder(storedSortOrder);
+        }
 
-    const {  posts, setPosts, currentUser, userVotes, setUserVotes,  sortOrder, setSortOrder, filterTags, setFilterTags  } = GlobalEffect();
+        const storedTags = localStorage.getItem("filterTags");
+        if (storedTags) {
+            setFilterTags(storedTags);
+        }
+    }, []);
 
-    getStoredData(posts.id);
-    // useEffect(() => {
-    //     const storedPosts = JSON.parse(localStorage.getItem("posts")) || [];
-    //     console.log("Stored posts:", storedPosts);
-    //     setPosts(storedPosts);
-    //
-    //     const storedUser = JSON.parse(localStorage.getItem("currentUser"));
-    //     if (storedUser) {
-    //         console.log("Stored user:", storedUser);
-    //         setCurrentUser(storedUser);
-    //         const storedVotes = JSON.parse(localStorage.getItem(`userVotes_${storedUser.name}`)) || {};
-    //         setUserVotes(storedVotes);
-    //
-    //         // Получаем подписки пользователя
-    //         let subscriptions = [];
-    //         if (storedUser.subs) {
-    //             if (typeof storedUser.subs === 'string') {
-    //                 subscriptions = storedUser.subs.split(','); // если это строка
-    //             } else if (Array.isArray(storedUser.subs)) {
-    //                 subscriptions = storedUser.subs; // если это массив
-    //             }
-    //         }
-    //         console.log("User subscriptions:", subscriptions);
-    //         setSubscribedAuthors(subscriptions);
-    //     }
-    //
-    //     const storedSortOrder = localStorage.getItem("sortOrder");
-    //     if (storedSortOrder) {
-    //         setSortOrder(storedSortOrder);
-    //     }
-    //
-    //     const storedTags = localStorage.getItem("filterTags");
-    //     if (storedTags) {
-    //         setFilterTags(storedTags);
-    //     }
-    // }, []);
+    useEffect(() => {
+        if (currentUser) {
+            localStorage.setItem(`userVotes_${currentUser.name}`, JSON.stringify(userVotes));
+        }
+    }, [userVotes, currentUser]);
 
-    // useEffect(() => {
-    //     if (currentUser) {
-    //         localStorage.setItem(`userVotes_${currentUser.name}`, JSON.stringify(userVotes));
-    //     }
-    // }, [userVotes, currentUser]);
-    //
-    // useEffect(() => {
-    //     localStorage.setItem("sortOrder", sortOrder);
-    // }, [sortOrder]);
-    //
+    useEffect(() => {
+        localStorage.setItem("sortOrder", sortOrder);
+    }, [sortOrder]);
+
     useEffect(() => {
         localStorage.setItem("filterTags", filterTags);
     }, [filterTags]);
@@ -147,52 +130,28 @@ const PostsList = () => {
             [postId]: "",
         }));
     };
-    // Фильтрация постов по подпискам и тегам
 
+    // Фильтрация постов по подпискам и тегам
     const filteredPosts = showSubscribedPosts
         ? posts.filter(post => {
             // Проверка на подписки
-            if (!currentUser || !Array.isArray(currentUser.subs)) return false;
+            if (!currentUser || !currentUser.subs) return false;
             const subscribedAuthors = currentUser.subs;
             const isSubscribed = subscribedAuthors.includes(post.authorId);
 
             // Проверка на теги
-            const tagFilter = filterTags ? filterTags.trim().toLowerCase() : "";
-            const postTags = Array.isArray(post.tags) ? post.tags : [];
-            const isMatchingTags = !tagFilter || postTags.some(tag => tagFilter.split(',').includes(tag.toLowerCase()));
+            const isMatchingTags =
+                !filterTags.trim() || post.tags.some((tag) => filterTags.split(',').map((t) => t.trim().toLowerCase()).includes(tag.toLowerCase()));
 
             return isSubscribed && isMatchingTags;
         })
         : posts.filter(post => {
             // Если фильтр подписок не включен, просто фильтруем по тегам
-            const tagFilter = filterTags ? filterTags.trim().toLowerCase() : "";
-            const postTags = Array.isArray(post.tags) ? post.tags : [];
-            const isMatchingTags = !tagFilter || postTags.some(tag => tagFilter.split(',').includes(tag.toLowerCase()));
+            const isMatchingTags =
+                !filterTags.trim() || post.tags.some((tag) => filterTags.split(',').map((t) => t.trim().toLowerCase()).includes(tag.toLowerCase()));
 
             return isMatchingTags;
         });
-
-
-    // const filteredPosts = showSubscribedPosts
-    //     ? posts.filter(post => {
-    //         // Проверка на подписки
-    //         if (!currentUser || !currentUser.subs) return false;
-    //         const subscribedAuthors = currentUser.subs;
-    //         const isSubscribed = subscribedAuthors.includes(post.authorId);
-    //
-    //         // Проверка на теги
-    //         const isMatchingTags =
-    //             !filterTags.trim() || post.tags.some((tag) => filterTags.split(',').map((t) => t.trim().toLowerCase()).includes(tag.toLowerCase()));
-    //
-    //         return isSubscribed && isMatchingTags;
-    //     })
-    //     : posts.filter(post => {
-    //         // Если фильтр подписок не включен, просто фильтруем по тегам
-    //         const isMatchingTags =
-    //             !filterTags.trim() || post.tags.some((tag) => filterTags.split(',').map((t) => t.trim().toLowerCase()).includes(tag.toLowerCase()));
-    //
-    //         return isMatchingTags;
-    //     });
 
 
     // Сортировка по дате
@@ -268,18 +227,65 @@ const PostsList = () => {
                 filteredPosts.map((post) => (
                     <div key={post.id} className="p-4 mb-4 border rounded-lg flex flex-col w-1/2">
 
-                        <Post
+
+                        <PostContent
                             post={post}
+                            handleToggleContent={handleToggleContent}
+                        />
+
+                        <PostMeta post={post} author={post.author} createdAt={post.createdAt} />
+
+                        {/* Reactions component */}
+                        <Reactions
+                            postId={post.id}
+                            likes={post.likes}
+                            dislikes={post.dislikes}
                             userVote={userVotes[post.id]}
                             handleReaction={handleReaction}
+                        />
+
+                        {/* Теги */}
+
+                        <PostTags tags={post.tags} handleTagClick={handleTagClick} />
+
+
+                        {/*<div>*/}
+                        {/*    {post.tags.length > 0 && (*/}
+                        {/*        <div className="mt-2">*/}
+                        {/*            <span className="text-gray-500">Теги:</span>{" "}*/}
+                        {/*            {post.tags.map((tag, index) => (*/}
+                        {/*                <span*/}
+                        {/*                    key={index}*/}
+                        {/*                    className="text-blue-500 cursor-pointer"*/}
+                        {/*                    onClick={() => handleTagClick(tag)}*/}
+                        {/*                >*/}
+                        {/*        #{tag}{" "}*/}
+                        {/*    </span>*/}
+                        {/*            ))}*/}
+                        {/*        </div>*/}
+                        {/*    )}*/}
+                        {/*</div>*/}
+
+                        {/* Comments component */}
+                        <Comments
+                            postId={post.id}
+                            comments={post.comments}
                             commentInput={commentInputs[post.id]}
                             handleCommentChange={handleCommentChange}
                             handleAddComment={handleAddComment}
-                            currentUser={currentUser?.name}
-                            handleToggleContent={handleToggleContent}
-                            handleTagClick={handleTagClick}
                         />
 
+                        {currentUser === post.author && (
+                            <PostActions
+                                post={post}
+                                // editingPostId={editingPostId}
+                                // editContent={editContent}
+                                // setEditContent={setEditContent}
+                                // handleEditPost={handleEditPost}
+                                // handleSaveEdit={handleSaveEdit}
+                                // handleDeletePost={handleDeletePost}
+                            />
+                        )}
                     </div>
                 ))
             ) : (

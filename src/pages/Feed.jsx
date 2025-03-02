@@ -5,7 +5,7 @@ import PostsList from "../components/PostList";
 const Feed = () => {
     return (
         <>
-        <CreatePost/>
+        {/*<CreatePost/>*/}
         <PostsList/>
         </>
     )

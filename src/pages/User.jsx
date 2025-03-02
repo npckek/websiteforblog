@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Reactions from "../components/Reactions";
 import Comments from "../components/Comments";
+import PostActions from "../components/PostActions";
 
 const User = () => {
     const { authorName } = useParams(); // Получаем имя автора из URL
@@ -14,6 +15,8 @@ const User = () => {
     const [editingPostId, setEditingPostId] = useState(null); // ID редактируемого поста
     const [editContent, setEditContent] = useState(""); // Содержимое редактируемого поста
     const [isSubscribed, setIsSubscribed] = useState();
+    const [users, setUsers] = useState([]);
+    const [authorId, setAuthorId] = useState(''); // ID автора
 
 
     useEffect(() => {
@@ -21,19 +24,25 @@ const User = () => {
         const filteredPosts = storedPosts.filter(post => post.author === authorName);
         setPosts(filteredPosts);
 
+        const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
+        setUsers(storedUsers);
+
         const storedUser = JSON.parse(localStorage.getItem("currentUser"));
         if (storedUser) {
-            setCurrentUser(storedUser.name);
+            setCurrentUser(storedUser);
+
+            // Находим ID автора
+            const author = storedUsers.find(user => user.name === authorName);
+            if (author) {
+                setAuthorId(author.id);
+
+                // Проверяем подписан ли текущий пользователь на автора
+                setIsSubscribed(storedUser.subs.includes(author.id));
+
+            }
         }
 
-        const storedUsers = JSON.parse(localStorage.getItem("users"));
-        if (storedUsers.length > 0) {
-            storedUsers.forEach(user => console.log("ID пользователя:", user.id));
-        } else {
-            console.log("Нет пользователей в localStorage");
-        }
     }, [authorName]);
-
 
 
     // const storedUsers = JSON.parse(localStorage.getItem("users"));
@@ -42,10 +51,38 @@ const User = () => {
     //     console.log("ID пользователя:", storedUsers.id);
     // }
 
+    // Функция подписки
+    const handleSubscribe = () => {
+        if (!currentUser || !authorId) return;
+
+        let updatedSubs = [...currentUser.subs];
+
+        if (isSubscribed) {
+            // Удаляем подписку
+            updatedSubs = updatedSubs.filter(id => id !== authorId);
+        } else {
+            // Добавляем подписку
+            updatedSubs.push(authorId);
+        }
+
+        // Обновляем текущего пользователя
+        const updatedUser = { ...currentUser, subs: updatedSubs };
+        setCurrentUser(updatedUser);
+        setIsSubscribed(!isSubscribed);
+
+        // Обновляем массив пользователей
+        const updatedUsers = users.map(user =>
+            user.id === currentUser.id ? updatedUser : user
+        );
+
+        // Сохраняем в localStorage
+        localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+        localStorage.setItem("users", JSON.stringify(updatedUsers));
+    };
 
 
 
-
+    // Реакции на публикации, посмотреть что с ними не так...
     const handleReaction = (postId, type) => {
         const currentVote = userVotes[postId];
         const updatedPosts = [...posts];
@@ -114,7 +151,7 @@ const User = () => {
         const allPosts = JSON.parse(localStorage.getItem("posts")) || [];
 
         // Оставляем в списке все посты, кроме удаляемого
-        const updatedPosts = allPosts.filter(post => post.id !== postId);
+        const updatedPosts = allPosts.filter(post => !(post.id === postId && post.author === authorName));
 
         setPosts(updatedPosts.filter(post => post.author === authorName)); // Обновляем состояние
         localStorage.setItem("posts", JSON.stringify(updatedPosts)); // Обновляем localStorage
@@ -150,12 +187,21 @@ const User = () => {
     return (
         <div>
             <h2 className="text-xl font-bold mb-4">Посты {authorName}</h2>
+
             {posts.length > 0 ? (
                 posts.map(post => (
                     <div key={post.id} className="p-4 border rounded-lg w-1/2">
                         <h3 className="font-semibold">{post.title}</h3>
-
-                        {/* Редактируемый текст */}
+                        {/*Подписка на пользователя*/}
+                        {currentUser && currentUser.name !== authorName && (
+                            <button
+                                className={`px-4 py-2 rounded ${isSubscribed ? "bg-red-500" : "bg-blue-500"} text-white`}
+                                onClick={handleSubscribe}
+                            >
+                                {isSubscribed ? "Отписаться" : "Подписаться"}
+                            </button>
+                        )}{
+                            /* Редактируемый текст */}
                         {editingPostId === post.id ? (
                             <textarea
                                 className="w-full border rounded-lg p-2"
@@ -171,13 +217,13 @@ const User = () => {
                             Автор: {post.author}
                         </p>
 
-                        <Reactions
-                            postId={post.id}
-                            likes={post.likes}
-                            dislikes={post.dislikes}
-                            userVote={userVotes[post.id]}
-                            handleReaction={handleReaction}
-                        />
+                        {/*<Reactions*/}
+                        {/*    postId={post.id}*/}
+                        {/*    likes={post.likes}*/}
+                        {/*    dislikes={post.dislikes}*/}
+                        {/*    userVote={userVotes[post.id]}*/}
+                        {/*    handleReaction={handleReaction}*/}
+                        {/*/>*/}
 
                         {/* Теги */}
                         <div>
@@ -197,6 +243,7 @@ const User = () => {
                             )}
                         </div>
 
+
                         <Comments
                             postId={post.id}
                             comments={post.comments}
@@ -205,33 +252,44 @@ const User = () => {
                             handleAddComment={handleAddComment}
                         />
 
-                        {/* Показываем кнопки, если пользователь совпадает */}
-                        {currentUser === post.author && (
-                            <div className="mt-2">
-                                {editingPostId === post.id ? (
-                                    <button
-                                        className="bg-green-500 text-white px-2 py-1 rounded mr-2"
-                                        onClick={() => handleSaveEdit(post.id)}
-                                    >
-                                        Сохранить
-                                    </button>
-                                ) : (
-                                    <button
-                                        className="bg-blue-500 text-white px-2 py-1 rounded mr-2"
-                                        onClick={() => handleEditPost(post)}
-                                    >
-                                        Редактировать
-                                    </button>
-                                )}
-
-                                <button
-                                    className="bg-red-500 text-white px-2 py-1 rounded"
-                                    onClick={() => handleDeletePost(post.id)}
-                                >
-                                    Удалить
-                                </button>
-                            </div>
+                        {currentUser.id === post.authorId && (
+                            <PostActions
+                                post={post}
+                                editingPostId={editingPostId}
+                                editContent={editContent}
+                                setEditContent={setEditContent}
+                                handleEditPost={handleEditPost}
+                                handleSaveEdit={handleSaveEdit}
+                                handleDeletePost={handleDeletePost}
+                            />
                         )}
+                         {/*Показываем кнопки, если пользователь совпадает*/}
+                        {/*{currentUser.id === post.authorId && (*/}
+                        {/*    <div className="mt-2">*/}
+                        {/*        {editingPostId === post.id ? (*/}
+                        {/*            <button*/}
+                        {/*                className="bg-green-500 text-white px-2 py-1 rounded mr-2"*/}
+                        {/*                onClick={() => handleSaveEdit(post.id)}*/}
+                        {/*            >*/}
+                        {/*                Сохранить*/}
+                        {/*            </button>*/}
+                        {/*        ) : (*/}
+                        {/*            <button*/}
+                        {/*                className="bg-blue-500 text-white px-2 py-1 rounded mr-2"*/}
+                        {/*                onClick={() => handleEditPost(post)}*/}
+                        {/*            >*/}
+                        {/*                Редактировать*/}
+                        {/*            </button>*/}
+                        {/*        )}*/}
+
+                        {/*        <button*/}
+                        {/*            className="bg-red-500 text-white px-2 py-1 rounded"*/}
+                        {/*            onClick={() => handleDeletePost(post.id)}*/}
+                        {/*        >*/}
+                        {/*            Удалить*/}
+                        {/*        </button>*/}
+                        {/*    </div>*/}
+                        {/*)}*/}
                     </div>
                 ))
             ) : (
