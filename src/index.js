@@ -8,7 +8,6 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Feed from "./pages/Feed";
 import User from "./pages/User";
-import Profile from "./pages/Profile";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -19,7 +18,6 @@ root.render(
             <Route path="/reg" element={<Register />} />
             <Route path="/feed" element={<Feed />} />
             <Route path="/user/:authorName" element={<User />} />
-            <Route path="profile/:authorName" element={<Profile />} />
         </Routes>
     </BrowserRouter>
 );

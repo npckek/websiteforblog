@@ -1,19 +1,15 @@
 import React from 'react';
 import {Link} from "react-router-dom";
-import { nanoid } from 'nanoid'
 import {initializeLocalStorage} from "../utils/initData";
+import Switcher from "../components/Switcher";
 
 const Home = () => {
-
-    const id = nanoid(10)
-
-    console.log(id)
 
     initializeLocalStorage();
 
     return (
-        <div className="bg-cyan-800 h-lvh w-lvw flex flex-col items-center justify-center">
-            <p className="text-white text-3xl m-2">
+        <div className="bg-background h-lvh w-lvw flex flex-col items-center justify-center">
+            <p className="text-text text-3xl m-2">
                 Welcome to our website!
             </p>
             <div className="flex flex-row">
@@ -27,6 +23,7 @@ const Home = () => {
                     Feed
                 </Link>
             </div>
+            <Switcher/>
 
         </div>
     )

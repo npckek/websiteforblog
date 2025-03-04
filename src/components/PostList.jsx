@@ -1,89 +1,39 @@
 import { useState, useEffect } from "react";
-import Reactions from "./Reactions";
-import Comments from "./Comments";
-import { Link } from "react-router-dom";
 import CreatePost from "./CreatePost";
-import PostMeta from "./PostMeta";
-import PostContent from "./PostContent";
-import PostTags from "./PostTags";
-import PostActions from "./PostActions";
 import Post from "./Post";
 import GlobalEffect from "../hooks/Effect";
-import getStoredData from "./test";
 
 const PostsList = () => {
-    // const [posts, setPosts] = useState([]);
-    // const [userVotes, setUserVotes] = useState({});
     const [commentInputs, setCommentInputs] = useState({});
-    // const [currentUser, setCurrentUser] = useState(null);
-    // const [filterTags, setFilterTags] = useState('');
-    // const [sortOrder, setSortOrder] = useState("newest");
-    // const [subscribedAuthors, setSubscribedAuthors] = useState([]);
     const [showSubscribedPosts, setShowSubscribedPosts] = useState(false);
-
-    const getStoredData = (key) => {
-        const data = localStorage.getItem(key);
-        try {
-            return data ? JSON.parse(data) : null;
-        } catch (error) {
-            console.error(`Ошибка парсинга JSON для ключа "${key}":`, error);
-            return null;
-        }
-    };
+    const [editingPostId, setEditingPostId] = useState(null); // ID редактируемого поста
+    const [editContent, setEditContent] = useState(""); // Содержимое редактируемого поста
 
 
-    const {  posts, setPosts, currentUser, userVotes, setUserVotes,  sortOrder, setSortOrder, filterTags, setFilterTags  } = GlobalEffect();
+    const {
+        posts,
+        users,
+        setUsers,
+        setPosts,
+        currentUser,
+        setCurrentUser,
+        userVotes,
+        setUserVotes,
+        sortOrder,
+        setSortOrder,
+        filterTags,
+        subscribedAuthors,
+        setSubscribedAuthors,
+        setFilterTags
+    } = GlobalEffect();
 
-    getStoredData(posts.id);
-    // useEffect(() => {
-    //     const storedPosts = JSON.parse(localStorage.getItem("posts")) || [];
-    //     console.log("Stored posts:", storedPosts);
-    //     setPosts(storedPosts);
-    //
-    //     const storedUser = JSON.parse(localStorage.getItem("currentUser"));
-    //     if (storedUser) {
-    //         console.log("Stored user:", storedUser);
-    //         setCurrentUser(storedUser);
-    //         const storedVotes = JSON.parse(localStorage.getItem(`userVotes_${storedUser.name}`)) || {};
-    //         setUserVotes(storedVotes);
-    //
-    //         // Получаем подписки пользователя
-    //         let subscriptions = [];
-    //         if (storedUser.subs) {
-    //             if (typeof storedUser.subs === 'string') {
-    //                 subscriptions = storedUser.subs.split(','); // если это строка
-    //             } else if (Array.isArray(storedUser.subs)) {
-    //                 subscriptions = storedUser.subs; // если это массив
-    //             }
-    //         }
-    //         console.log("User subscriptions:", subscriptions);
-    //         setSubscribedAuthors(subscriptions);
-    //     }
-    //
-    //     const storedSortOrder = localStorage.getItem("sortOrder");
-    //     if (storedSortOrder) {
-    //         setSortOrder(storedSortOrder);
-    //     }
-    //
-    //     const storedTags = localStorage.getItem("filterTags");
-    //     if (storedTags) {
-    //         setFilterTags(storedTags);
-    //     }
-    // }, []);
 
-    // useEffect(() => {
-    //     if (currentUser) {
-    //         localStorage.setItem(`userVotes_${currentUser.name}`, JSON.stringify(userVotes));
-    //     }
-    // }, [userVotes, currentUser]);
-    //
-    // useEffect(() => {
-    //     localStorage.setItem("sortOrder", sortOrder);
-    // }, [sortOrder]);
-    //
     useEffect(() => {
-        localStorage.setItem("filterTags", filterTags);
-    }, [filterTags]);
+        if (currentUser) {
+            setSubscribedAuthors(currentUser.subs);
+        }
+    }, [currentUser]);
+
 
     const handleReaction = (postId, type) => {
         const currentVote = userVotes[postId];
@@ -147,16 +97,13 @@ const PostsList = () => {
             [postId]: "",
         }));
     };
-    // Фильтрация постов по подпискам и тегам
 
     const filteredPosts = showSubscribedPosts
         ? posts.filter(post => {
-            // Проверка на подписки
             if (!currentUser || !Array.isArray(currentUser.subs)) return false;
             const subscribedAuthors = currentUser.subs;
             const isSubscribed = subscribedAuthors.includes(post.authorId);
 
-            // Проверка на теги
             const tagFilter = filterTags ? filterTags.trim().toLowerCase() : "";
             const postTags = Array.isArray(post.tags) ? post.tags : [];
             const isMatchingTags = !tagFilter || postTags.some(tag => tagFilter.split(',').includes(tag.toLowerCase()));
@@ -164,7 +111,6 @@ const PostsList = () => {
             return isSubscribed && isMatchingTags;
         })
         : posts.filter(post => {
-            // Если фильтр подписок не включен, просто фильтруем по тегам
             const tagFilter = filterTags ? filterTags.trim().toLowerCase() : "";
             const postTags = Array.isArray(post.tags) ? post.tags : [];
             const isMatchingTags = !tagFilter || postTags.some(tag => tagFilter.split(',').includes(tag.toLowerCase()));
@@ -173,29 +119,6 @@ const PostsList = () => {
         });
 
 
-    // const filteredPosts = showSubscribedPosts
-    //     ? posts.filter(post => {
-    //         // Проверка на подписки
-    //         if (!currentUser || !currentUser.subs) return false;
-    //         const subscribedAuthors = currentUser.subs;
-    //         const isSubscribed = subscribedAuthors.includes(post.authorId);
-    //
-    //         // Проверка на теги
-    //         const isMatchingTags =
-    //             !filterTags.trim() || post.tags.some((tag) => filterTags.split(',').map((t) => t.trim().toLowerCase()).includes(tag.toLowerCase()));
-    //
-    //         return isSubscribed && isMatchingTags;
-    //     })
-    //     : posts.filter(post => {
-    //         // Если фильтр подписок не включен, просто фильтруем по тегам
-    //         const isMatchingTags =
-    //             !filterTags.trim() || post.tags.some((tag) => filterTags.split(',').map((t) => t.trim().toLowerCase()).includes(tag.toLowerCase()));
-    //
-    //         return isMatchingTags;
-    //     });
-
-
-    // Сортировка по дате
     const sortedPosts = filteredPosts.sort((a, b) => {
         if (sortOrder === "newest") {
             return new Date(b.createdAt) - new Date(a.createdAt);
@@ -216,6 +139,10 @@ const PostsList = () => {
         setFilterTags(tag);
     };
 
+    const clearTags = () => {
+        setFilterTags("");
+    };
+
     const handleToggleContent = (postId) => {
         const updatedPosts = posts.map(post =>
             post.id === postId ? { ...post, isContentExpanded: !post.isContentExpanded } : post
@@ -223,68 +150,151 @@ const PostsList = () => {
         setPosts(updatedPosts);
     };
 
-    // Функция для добавления нового поста
     const handlePostCreate = (newPost) => {
         const updatedPosts = [...posts, newPost];
         setPosts(updatedPosts);
         localStorage.setItem("posts", JSON.stringify(updatedPosts));
     };
 
+    const handleEditPost = (post) => {
+        setEditingPostId(post.id);
+        setEditContent(post.content);
+    };
+
+    const handleSaveEdit = (postId) => {
+        const allPosts = JSON.parse(localStorage.getItem("posts")) || [];
+
+        const updatedPosts = allPosts.map(post =>
+            post.id === postId ? { ...post, content: editContent } : post
+        );
+
+        setPosts(updatedPosts.filter(post => post.author));
+        localStorage.setItem("posts", JSON.stringify(updatedPosts));
+
+        setEditingPostId(null);
+    };
+
+    const handleDeletePost = (postId) => {
+        const allPosts = JSON.parse(localStorage.getItem("posts")) || [];
+
+        // Оставляем в списке все посты, кроме удаляемого
+        const updatedPosts = allPosts.filter(post => !(post.id === postId && post.author));
+
+        setPosts(updatedPosts.filter(post => post.author));
+        localStorage.setItem("posts", JSON.stringify(updatedPosts));
+    };
+
+
+    const handleSubscribe = (authorId) => {
+        if (!currentUser || !authorId) return;
+
+        let updatedSubs = [...(currentUser.subs || [])];
+
+        if (subscribedAuthors.includes(authorId)) {
+            updatedSubs = updatedSubs.filter(id => id !== authorId);
+        } else {
+            updatedSubs.push(authorId);
+        }
+
+        const updatedUser = { ...currentUser, subs: updatedSubs };
+        setCurrentUser(updatedUser);
+        setSubscribedAuthors(updatedSubs);
+
+        const userExists = users.some(user => user.id === currentUser.id);
+
+        const updatedUsers = users.map(user =>
+            user.id === currentUser.id ? updatedUser : user
+        );
+
+
+        setUsers(updatedUsers);
+
+        localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+        localStorage.setItem("users", JSON.stringify(updatedUsers));
+
+    };
+
+    const handleCancelEdit = (postId) => {
+        setEditingPostId(null);
+        setEditContent("");
+    };
+
+
+
+
+
     return (
-        <div className="p-4 flex flex-col items-center justify-center">
-            <h2 className="text-xl font-bold mb-4 w-">Посты</h2>
-            <CreatePost onPostCreate={handlePostCreate} />
-            {/* Фильтрация по тегам */}
-            <div className="mb-4">
-                <input
-                    type="text"
-                    placeholder="Фильтровать по тегам (через запятую)"
-                    className="border rounded-lg p-2"
-                    value={filterTags}
-                    onChange={handleTagFilter}
+        <div className=" flex flex-col items-center bg-background">
+            <div className=" w-full flex flex-col items-center">
+                <div className='w-1/2'>
+                    <CreatePost onPostCreate={handlePostCreate}/>
+                </div>
+            </div>
+            <div className=" flex mb-4">
+                <div className="px-1">
+                    <input
+                        type="text"
+                        placeholder="Фильтровать по тегам (через запятую)"
+                        className="border border-border rounded-lg p-2 bg-block"
+                        value={filterTags}
+                        onChange={handleTagFilter}
+                    />
+                    <button className=" p-2 bg-blue-500 text-white rounded" onClick={clearTags} >
+                        Empty tags
+                    </button>
+                </div>
+                <div className="px-1">
+                    <select
+                        value={sortOrder}
+                        onChange={handleSortChange}
+                        className="border border-border bg-block rounded-lg p-2 h-full text-text"
+                    >
+                        <option value="newest">От новых к старым</option>
+                        <option value="oldest">От старых к новым</option>
+                    </select>
+                </div>
+                <div className="px-1">
+                    <button
+                        onClick={() => setShowSubscribedPosts(prevState => !prevState)}
+                        className=" p-2 bg-blue-500 text-white rounded"
+                    >
+                        {showSubscribedPosts ? "Показать все посты" : "Показать посты подписок"}
+                    </button>
+                </div>
+
+            </div>
+<div className=" w-full flex flex-col items-center">
+    {sortedPosts.length > 0 ? (
+        sortedPosts.map((post) => (
+            <div key={post.id} className=" w-1/2 mb-4 flex flex-col items-center">
+                <Post
+                    post={post}
+                    userVote={userVotes[post.id]}
+                    handleReaction={handleReaction}
+                    commentInput={commentInputs[post.id]}
+                    handleCommentChange={handleCommentChange}
+                    handleAddComment={handleAddComment}
+                    currentUser={currentUser?.name}
+                    handleToggleContent={handleToggleContent}
+                    handleTagClick={handleTagClick}
+                    editingPostId={editingPostId}
+                    editContent={editContent}
+                    setEditContent={setEditContent}
+                    handleEditPost={handleEditPost}
+                    handleSaveEdit={handleSaveEdit}
+                    handleDeletePost={handleDeletePost}
+                    isSubscribed={subscribedAuthors.includes(post.authorId)}
+                    handleSubscribe={handleSubscribe}
+                    authorId={post.authorId}
+                    handleCancelEdit={handleCancelEdit}
                 />
             </div>
+        ))
+    ) : (
+        <p className='text-text'>Постов пока нет или не найдено по указанным фильтрам.</p>
+    )}
+</div>
 
-            {/* Сортировка */}
-            <div className="mb-4">
-                <select
-                    value={sortOrder}
-                    onChange={handleSortChange}
-                    className="border rounded-lg p-2"
-                >
-                    <option value="newest">От новых к старым</option>
-                    <option value="oldest">От старых к новым</option>
-                </select>
-            </div>
-
-            <button
-                onClick={() => setShowSubscribedPosts(prevState => !prevState)}
-                className="mb-4 p-2 bg-blue-500 text-white rounded"
-            >
-                {showSubscribedPosts ? "Показать все посты" : "Показать посты подписок"}
-            </button>
-
-            {filteredPosts.length > 0 ? (
-                filteredPosts.map((post) => (
-                    <div key={post.id} className="p-4 mb-4 border rounded-lg flex flex-col w-1/2">
-
-                        <Post
-                            post={post}
-                            userVote={userVotes[post.id]}
-                            handleReaction={handleReaction}
-                            commentInput={commentInputs[post.id]}
-                            handleCommentChange={handleCommentChange}
-                            handleAddComment={handleAddComment}
-                            currentUser={currentUser?.name}
-                            handleToggleContent={handleToggleContent}
-                            handleTagClick={handleTagClick}
-                        />
-
-                    </div>
-                ))
-            ) : (
-                <p>Постов пока нет или не найдено по указанным фильтрам.</p>
-            )}
         </div>
     );
 };

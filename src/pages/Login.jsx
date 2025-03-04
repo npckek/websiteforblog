@@ -22,10 +22,9 @@ const Login = () => {
             updateCurrentUser(user);
             alert("Login successful!");
 
-            // Перенаправление на страницу с постами через 2 секунды
             setTimeout(() => {
                 navigate("/feed");
-            }, 1500);
+            }, 1000);
 
         } else {
             setError("Invalid email or password!");
@@ -35,13 +34,13 @@ const Login = () => {
 
     return (
         <div className="max-w-sm mx-auto">
-            <h2 className="text-center text-xl font-bold mb-4">Вход</h2>
+            <h2 className="text-center text-xl font-bold m-4 text-text">Авторизация</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label htmlFor="email" className="block text-sm font-medium">Email</label>
                     <input
                         type="email"
                         id="email"
+                        placeholder="Почта"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md"
@@ -49,10 +48,10 @@ const Login = () => {
                     />
                 </div>
                 <div>
-                    <label htmlFor="password" className="block text-sm font-medium">Пароль</label>
                     <input
                         type="password"
                         id="password"
+                        placeholder="Пароль"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md"
@@ -67,8 +66,8 @@ const Login = () => {
                     Войти
                 </button>
             </form>
-            <Link to="/reg">
-                <button aria-label="register"> New here? </button>
+            <Link to="/reg" className=' flex justify-center py-2 px-4 text-text  '>
+                <button aria-label="register" > Ещё нет аккаунта?</button>
             </Link>
         </div>
     )

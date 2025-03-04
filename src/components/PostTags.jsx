@@ -1,4 +1,5 @@
 const PostTags = ({ tags, handleTagClick }) => {
+
     return (
         <div>
             {tags.length > 0 && (

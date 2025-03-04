@@ -1,12 +1,12 @@
 import React from "react";
-import CreatePost from "../components/CreatePost";
 import PostsList from "../components/PostList";
+import Header from "../components/Header";
 
 const Feed = () => {
     return (
         <>
-        {/*<CreatePost/>*/}
-        <PostsList/>
+            <Header />
+            <PostsList/>
         </>
     )
 };

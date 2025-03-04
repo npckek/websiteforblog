@@ -1,11 +1,8 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
 import Reactions from "./Reactions";
 import Comments from "./Comments";
 import PostContent from "./PostContent";
 import PostMeta from "./PostMeta";
 import PostTags from "./PostTags";
-import PostActions from "./PostActions";
 import PostMenu from "./PostMenu";
 
 const Post = ({
@@ -24,9 +21,13 @@ const Post = ({
                   currentUser,
                   handleTagClick,
                   handleToggleContent,
+                  isSubscribed,
+                  handleSubscribe,
+                  authorId,
+                  handleCancelEdit,
               }) => {
     return (
-        <div key={post.id} className="p-4 mb-4 border rounded-lg flex flex-col ">
+        <div key={post.id} className="p-4 mb-4 border border-border rounded-lg flex flex-col bg-block w-full ">
 
             <PostMenu
                 post={post}
@@ -35,6 +36,7 @@ const Post = ({
                 handleDeletePost={handleDeletePost}
                 editingPostId={editingPostId}
                 handleSaveEdit={handleSaveEdit}
+                handleCancelEdit={handleCancelEdit}
             />
 
             <PostContent
@@ -42,10 +44,13 @@ const Post = ({
                 editingPostId={editingPostId}
                 editContent={editContent}
                 setEditContent={setEditContent}
+                handleSaveEdit={handleSaveEdit}
                 handleToggleContent={handleToggleContent}
+                handleEditPost={handleEditPost}
+                handleCancelEdit={handleCancelEdit}
             />
 
-            <PostMeta author={post.author} createdAt={post.createdAt} />
+            <PostMeta author={post.author} createdAt={post.createdAt} currentUser={currentUser} isSubscribed={isSubscribed} handleSubscribe={handleSubscribe} authorId={authorId}  />
             <Reactions postId={post.id} likes={post.likes} dislikes={post.dislikes} userVote={userVote} handleReaction={handleReaction} />
             <PostTags tags={post.tags} handleTagClick={handleTagClick} />
             <Comments
@@ -55,18 +60,6 @@ const Post = ({
                 handleCommentChange={handleCommentChange}
                 handleAddComment={handleAddComment}
             />
-
-            {currentUser === post.author && (
-                <PostActions
-                    post={post}
-                    editingPostId={editingPostId}
-                    editContent={editContent}
-                    setEditContent={setEditContent}
-                    handleEditPost={handleEditPost}
-                    handleSaveEdit={handleSaveEdit}
-                    handleDeletePost={handleDeletePost}
-                />
-            )}
         </div>
     );
 };

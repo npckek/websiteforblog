@@ -17,7 +17,7 @@ export const initializeLocalStorage = () => {
                 createdAt: "2025-03-01T09:18:11.134Z",
                 dislikes: 0,
                 id: post1Id,
-                likes: 0,
+                likes: 1,
                 tags: [ "Important" , "News" ],
                 title: "Lorem",
             },
@@ -29,7 +29,7 @@ export const initializeLocalStorage = () => {
                 content: "This is my first Post on this website",
                 dislikes: 0,
                 id: post2Id,
-                likes: 0,
+                likes: 1,
                 tags: [ "Meme" , "First" ],
                 title: "First Commit",
             }
@@ -56,17 +56,16 @@ export const initializeLocalStorage = () => {
         localStorage.setItem("users", JSON.stringify(testUsers));
     }
 
-    if (!localStorage.getItem("currentUser")) {
-        const testUsers = [
-            { email: "Adam@google.com",
-                id: user1Id,
-                name: "Adam",
-                password: "password",
-                subs: [ ],
-            },
-        ];
-        localStorage.setItem("currentUser", JSON.stringify(testUsers));
-    }
+    // if (!localStorage.getItem("currentUser")) {
+    //     const testCurrentUser = {
+    //         email: "Adam@google.com",
+    //         id: user1Id,
+    //         name: "Adam",
+    //         password: "password",
+    //         subs: [ ], // Используйте пустой массив для подписок
+    //     };
+    //     localStorage.setItem("currentUser", JSON.stringify(testCurrentUser));
+    // }
 
 
 };

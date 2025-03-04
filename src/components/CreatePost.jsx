@@ -8,12 +8,6 @@ const CreatePost = ({onPostCreate}) => {
     const [error, setError] = useState('');
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
-    // const handleReload = () => {
-    //     setTimeout(() => {
-    //         window.location.reload();
-    //     }, 1500);
-    // };
-
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -62,42 +56,34 @@ const CreatePost = ({onPostCreate}) => {
     };
 
     return (
-        <div className="w-1/2 mx-auto">
-            <h2 className="text-center text-xl font-bold mb-4">Создать пост</h2>
-            <form onSubmit={handleSubmit} className="space-y-4 p-4">
-                <div>
-                    <input
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                        placeholder='Введите название'
-                        required
-                    />
-                </div>
-                <div>
-                    <textarea
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                        placeholder="Напишите свой пост..."
-                        rows="4"
-                        required
-                        maxLength="720"
-                    />
-                </div>
-                <div>
-                    <input
-                        type="text"
-                        value={tags}
-                        onChange={(e) => setTags(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                        placeholder="Теги (через пробел)"
-                    />
-                </div>
+        <div className="flex w-full flex-col items-center bg-background">
+            <form onSubmit={handleSubmit} className="space-y-4 p-4 w-full flex flex-col items-center ">
+                <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full px-3 py-2 border border-border rounded-md bg-block text-text"
+                    placeholder='Введите название'
+                    required
+                />
+                <textarea
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    className="w-full px-3 py-2 border border-border rounded-md bg-block text-text"
+                    placeholder="Напишите свой пост..."
+                    rows="4"
+                    required
+                    maxLength="720"
+                />
+                <input
+                    type="text"
+                    value={tags}
+                    onChange={(e) => setTags(e.target.value)}
+                    className="w-full px-3 py-2 border border-border rounded-md bg-block text-text"
+                    placeholder="Теги (через пробел)"
+                />
                 {error && <p className="text-red-500 text-sm">{error}</p>}
                 <button
-                    // onClick={handleReload}
                     type="submit"
                     className="w-full py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
                 >
