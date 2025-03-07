@@ -15,7 +15,7 @@
 1. **Клонируйте репозиторий**:
    ```bash
    git clone <URL>
-   cd react-post-management
+   cd websiteforblog
 
 Установите зависимости:
 
