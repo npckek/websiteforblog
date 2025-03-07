@@ -1,70 +1,42 @@
-# Getting Started with Create React App
+# React Post Management App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Это приложение для управления постами с использованием React. Пользователи могут оставлять реакции на посты, добавлять комментарии и фильтровать посты по различным критериям.
 
-## Available Scripts
+## Особенности
 
-In the project directory, you can run:
+- **Реакции на посты**: Пользователи могут ставить лайки и дизлайки на посты.
+- **Комментарии**: Возможность добавлять комментарии к постам.
+- **Фильтрация и сортировка**: Фильтрация постов по тегам и сортировка по дате.
+- **Подписки на авторов**: Возможность просматривать посты только от авторов, на которых подписан пользователь.
+- **Хранение данных**: Использование `localStorage` для сохранения состояния между сессиями.
 
-### `npm start`
+## Установка
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. **Клонируйте репозиторий**:
+   ```bash
+   git clone <URL>
+   cd react-post-management
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Установите зависимости:
 
-### `npm test`
+    npm install
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Запустите приложение:
 
-### `npm run build`
+    npm start
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Использование
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+    Реакции: Нажмите на кнопку "Лайк" или "Дизлайк" под постом, чтобы оставить свою реакцию.
+    Комментарии: Введите комментарий в поле ввода и нажмите "Отправить".
+    Фильтрация: Используйте поле ввода для фильтрации постов по тегам.
+    Сортировка: Выберите порядок сортировки постов (от новых к старым или наоборот).
+    Подписки: Нажмите кнопку, чтобы показать посты только от авторов, на которых вы подписаны.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Технологии
 
-### `npm run eject`
+    React: Библиотека для создания пользовательских интерфейсов.
+    LocalStorage: Используется для сохранения данных между сессиями.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Если у вас есть вопросы или предложения, пожалуйста, свяжитесь с мной по адресу npckek@gmail.com.
